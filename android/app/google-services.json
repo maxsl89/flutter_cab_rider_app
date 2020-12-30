@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "490594976115",
+    "firebase_url": "https://beetaxi-f0f10-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "beetaxi-f0f10",
+    "storage_bucket": "beetaxi-f0f10.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:490594976115:android:ec98282689c890a41f4506",
+        "android_client_info": {
+          "package_name": "com.maxsl.cubrider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "490594976115-utc1lap8i3uujbgvb8692r93ddot1bk7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8C-qjocIZB26Bq2YgfZJmY-gBxZyjQVo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "490594976115-utc1lap8i3uujbgvb8692r93ddot1bk7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
