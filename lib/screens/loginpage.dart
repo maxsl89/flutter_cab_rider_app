@@ -1,7 +1,11 @@
 import 'package:cubrider/brand_colors.dart';
+import 'package:cubrider/screens/registrationpage.dart';
 import 'package:flutter/material.dart';
  
 class LoginPage extends StatelessWidget {
+
+  static const String id = 'login';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +24,7 @@ class LoginPage extends StatelessWidget {
                   image: AssetImage('images/logo.png'),
                 ),
                 SizedBox(height: 40),
-                Text('Sign In as a Rider',
+                Text('Войти как водитель',
                 textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 25, fontFamily: 'Brand-Bold')
                 ),
@@ -31,7 +35,7 @@ class LoginPage extends StatelessWidget {
                       TextField(
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                            labelText: "Email address",
+                            labelText: "Email адрес",
                             labelStyle: TextStyle(
                                 fontSize: 14
                             ),
@@ -48,7 +52,7 @@ class LoginPage extends StatelessWidget {
                       TextField(
                         obscureText: true,
                         decoration: InputDecoration(
-                            labelText: "Password",
+                            labelText: "Пароль",
                             labelStyle: TextStyle(
                                 fontSize: 14
                             ),
@@ -75,7 +79,7 @@ class LoginPage extends StatelessWidget {
                           height: 50,
                           child: Center(
                             child: Text(
-                                'LOGIN',
+                                'ВОЙТИ',
                                 style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold')
                             ),
                           ),
@@ -88,7 +92,9 @@ class LoginPage extends StatelessWidget {
                 ),
 
                 FlatButton(
-                    onPressed: (){},
+                    onPressed: (){
+                      Navigator.pushNamedAndRemoveUntil(context, RegistrationPage.id, (route) => false);
+                    },
                     child: Text('Не зарегистрированы? Создайте аккаунт'))
 
 

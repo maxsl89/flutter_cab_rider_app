@@ -1,5 +1,6 @@
 import 'package:cubrider/screens/mainpage.dart';
 import 'package:cubrider/screens/loginpage.dart';
+import 'package:cubrider/screens/registrationpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -37,7 +38,12 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Brand-Regular',
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      initialRoute: RegistrationPage.id,
+      routes: {
+        RegistrationPage.id: (context) => RegistrationPage(),
+        LoginPage.id: (context) => LoginPage(),
+        MainPage.id: (context) => MainPage()
+      },
     );
   }
 }
