@@ -1,5 +1,6 @@
 import 'package:cubrider/brand_colors.dart';
 import 'package:cubrider/screens/registrationpage.dart';
+import 'package:cubrider/widgets/TaxiButton.dart';
 import 'package:flutter/material.dart';
  
 class LoginPage extends StatelessWidget {
@@ -66,24 +67,12 @@ class LoginPage extends StatelessWidget {
 
                       SizedBox( height: 40),
 
-                      RaisedButton(
+                      TaxiButton(
+                        title: 'ВОЙТИ',
+                        color: BrandColors.colorGreen,
                         onPressed: (){
 
                         },
-                        color: BrandColors.colorGreen,
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(25)
-                        ),
-                        textColor: Colors.white,
-                        child: Container(
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                                'ВОЙТИ',
-                                style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold')
-                            ),
-                          ),
-                        ),
                       ),
 
 
@@ -106,3 +95,5 @@ class LoginPage extends StatelessWidget {
     );
   }
 }
+
+

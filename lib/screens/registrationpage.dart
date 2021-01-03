@@ -1,14 +1,84 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:cubrider/brand_colors.dart';
 import 'package:cubrider/screens/loginpage.dart';
+import 'package:cubrider/screens/mainpage.dart';
+import 'package:cubrider/widgets/TaxiButton.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-class RegistrationPage extends StatelessWidget {
+class RegistrationPage extends StatefulWidget {
 
   static const String id = 'register';
 
   @override
+  _RegistrationPageState createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void showSnackBar(String title){
+    final snackbar = SnackBar(
+      content: Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 15),)
+    );
+    scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  var fullNameController = TextEditingController();
+
+  var phoneController = TextEditingController();
+
+  var emailController = TextEditingController();
+
+  var passwordController = TextEditingController();
+
+  Future<void> registerUser() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text
+      );
+
+      // check if user registration is successful
+      if(userCredential != null){
+        DatabaseReference newUserRef = FirebaseDatabase.instance.reference().child('users/${userCredential.user.uid}');
+
+        //prepare data to be saved on users table
+        Map userMap = {
+          'fullname': fullNameController.text,
+          'email': emailController.text,
+          'phone': phoneController.text,
+        };
+
+        newUserRef.set(userMap);
+
+        //Take the user to the main page
+        Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        // print('The password provided is too weak.');
+        showSnackBar('Пароль слишком слабый');
+      } else if (e.code == 'email-already-in-use') {
+        // print('The account already exists for that email.');
+        showSnackBar('Пользователь с таким имейлом уже зарегистрирован');
+      } else {
+        showSnackBar(e.code);
+      }
+    } catch (e) {
+      print(e);
+    }
+
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: scaffoldKey,
         backgroundColor: Colors.white,
         body: SafeArea(
           child: SingleChildScrollView(
@@ -34,6 +104,7 @@ class RegistrationPage extends StatelessWidget {
                       children: <Widget>[
                         // Full name
                         TextField(
+                          controller: fullNameController,
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                               labelText: "Имя Фамилия",
@@ -51,6 +122,7 @@ class RegistrationPage extends StatelessWidget {
                         SizedBox(height: 10),
                         // Email address
                         TextField(
+                          controller: emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                               labelText: "Email адрес",
@@ -69,6 +141,7 @@ class RegistrationPage extends StatelessWidget {
 
                         // Phone number
                         TextField(
+                          controller: phoneController,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               labelText: "Телефон",
@@ -87,6 +160,7 @@ class RegistrationPage extends StatelessWidget {
 
                         // Password
                         TextField(
+                          controller: passwordController,
                           obscureText: true,
                           decoration: InputDecoration(
                               labelText: "Пароль",
@@ -103,24 +177,40 @@ class RegistrationPage extends StatelessWidget {
 
                         SizedBox( height: 40),
 
-                        RaisedButton(
-                          onPressed: (){
-
-                          },
+                        TaxiButton(
+                          title: 'Рагистрация',
                           color: BrandColors.colorGreen,
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(25)
-                          ),
-                          textColor: Colors.white,
-                          child: Container(
-                            height: 50,
-                            child: Center(
-                              child: Text(
-                                  'РЕГИСТРАЦИЯ',
-                                  style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold')
-                              ),
-                            ),
-                          ),
+                          onPressed: () async{
+
+                            //check network availability
+                            var connectivityResult = await Connectivity().checkConnectivity();
+                            if(connectivityResult != ConnectivityResult.mobile && connectivityResult != ConnectivityResult.wifi){
+                              showSnackBar('Нет интернет соединения');
+                              return;
+                            }
+
+                            if(fullNameController.text.length < 3){
+                              showSnackBar('Пожалуйста введите полное Имя и Фамилию');
+                              return;
+                            }
+
+                            if(phoneController.text.length < 10){
+                              showSnackBar('Пожалуйста введите корректный номер телефона');
+                              return;
+                            }
+
+                            if(!emailController.text.contains('@')){
+                              showSnackBar('Введите корректный имейл');
+                              return;
+                            }
+
+                            if(passwordController.text.length < 8){
+                              showSnackBar('Пароль должен состоять минимум из 8 символов');
+                              return;
+                            }
+
+                            registerUser();
+                          },
                         ),
 
 
