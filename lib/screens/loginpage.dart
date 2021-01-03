@@ -1,15 +1,70 @@
+import 'dart:math';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:cubrider/brand_colors.dart';
+import 'package:cubrider/screens/mainpage.dart';
 import 'package:cubrider/screens/registrationpage.dart';
 import 'package:cubrider/widgets/TaxiButton.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
  
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
 
   static const String id = 'login';
 
   @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void showSnackBar(String title){
+    final snackbar = SnackBar(
+        content: Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 15),)
+    );
+    scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  var emailController = TextEditingController();
+
+  var passwordController = TextEditingController();
+
+  void login () async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text
+      );
+
+      if(userCredential != null){
+        // verify login
+        DatabaseReference userRef = FirebaseDatabase.instance.reference().child('users/${userCredential.user.uid}');
+
+        userRef.once().then((DataSnapshot snapshot) => {
+          if(snapshot.value != null){
+            Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false)
+          }
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        showSnackBar('Пользователь с таким имейлом не найден');
+      } else if (e.code == 'wrong-password') {
+        showSnackBar('Не верный пароль');
+      }
+    }
+
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -34,6 +89,7 @@ class LoginPage extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       TextField(
+                        controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                             labelText: "Email адрес",
@@ -51,6 +107,7 @@ class LoginPage extends StatelessWidget {
                       SizedBox(height: 10),
 
                       TextField(
+                        controller: passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
                             labelText: "Пароль",
@@ -70,7 +127,25 @@ class LoginPage extends StatelessWidget {
                       TaxiButton(
                         title: 'ВОЙТИ',
                         color: BrandColors.colorGreen,
-                        onPressed: (){
+                        onPressed: () async {
+                          //check network availability
+                          var connectivityResult = await Connectivity().checkConnectivity();
+                          if(connectivityResult != ConnectivityResult.mobile && connectivityResult != ConnectivityResult.wifi){
+                            showSnackBar('Нет интернет соединения');
+                            return;
+                          }
+
+                          if(!emailController.text.contains('@')){
+                            showSnackBar('Введите корректный имейл');
+                            return;
+                          }
+
+                          if(passwordController.text.length < 8){
+                            showSnackBar('Пароль должен состоять минимум из 8 символов');
+                            return;
+                          }
+
+                          login();
 
                         },
                       ),
