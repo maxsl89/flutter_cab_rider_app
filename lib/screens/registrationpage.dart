@@ -2,6 +2,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:cubrider/brand_colors.dart';
 import 'package:cubrider/screens/loginpage.dart';
 import 'package:cubrider/screens/mainpage.dart';
+import 'package:cubrider/widgets/ProgressDialog.dart';
 import 'package:cubrider/widgets/TaxiButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -36,6 +37,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var passwordController = TextEditingController();
 
   Future<void> registerUser() async {
+
+    // show please wait dialog
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => ProgressDialog(status: 'Подождите',)
+    );
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
@@ -59,6 +68,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
       }
     } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
       if (e.code == 'weak-password') {
         // print('The password provided is too weak.');
         showSnackBar('Пароль слишком слабый');

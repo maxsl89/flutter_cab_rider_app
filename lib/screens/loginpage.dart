@@ -4,6 +4,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:cubrider/brand_colors.dart';
 import 'package:cubrider/screens/mainpage.dart';
 import 'package:cubrider/screens/registrationpage.dart';
+import 'package:cubrider/widgets/ProgressDialog.dart';
 import 'package:cubrider/widgets/TaxiButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -34,6 +35,14 @@ class _LoginPageState extends State<LoginPage> {
   var passwordController = TextEditingController();
 
   void login () async {
+
+    // show please wait dialog
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => ProgressDialog(status: 'Подождите',)
+    );
+
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: emailController.text,
@@ -51,6 +60,7 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
     } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
       if (e.code == 'user-not-found') {
         showSnackBar('Пользователь с таким имейлом не найден');
       } else if (e.code == 'wrong-password') {
